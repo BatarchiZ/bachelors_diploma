@@ -49,7 +49,7 @@ class Transformer(nn.Module):
             if p.dim() > 1:
                 nn.init.xavier_uniform_(p)
 
-    def forward(self, src, mask, query_embed, pos_embed, latent_input=None, proprio_input=None, additional_pos_embed=None, type=None):
+    def forward(self, src, mask, query_embed, pos_embed, latent_input=None, proprio_input=None, additional_pos_embed=None, obj_type=None):
         # TODO flatten only when input has H and W
         if len(src.shape) == 4: # has H and W
             # flatten NxCxHxW to HWxNxC
@@ -69,10 +69,8 @@ class Transformer(nn.Module):
             pos_embed = pos_embed.unsqueeze(1).repeat(1, bs, 1)
             query_embed = query_embed.unsqueeze(1).repeat(1, bs, 1)
 
-        # Modification if there is object type then add to SRC an embedding of the type 
-        if not None or not torch.isnan(type).any():
-            # print("TYPE ISSSSSSSSSSSSSSSSSS", type)
-            type_embed = self.type_embedding(type.long().to(src.device))
+        if not None or not torch.isnan(obj_type).any(): # Modification if there is object type then add to SRC an embedding of the type 
+            type_embed = self.type_embedding(obj_type.long().to(src.device))
             type_embed = type_embed.unsqueeze(0).repeat(src.shape[0], 1, 1)
             src = src + type_embed
 

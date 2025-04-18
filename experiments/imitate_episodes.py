@@ -144,7 +144,7 @@ def get_image(ts, camera_names):
         curr_image = rearrange(ts.observation['images'][cam_name], 'h w c -> c h w')
         curr_images.append(curr_image)
     curr_image = np.stack(curr_images, axis=0)
-    curr_image = torch.from_numpy(curr_image / 255.0).float().to(torch.device("cpu")).unsqueeze(0)
+    curr_image = torch.from_numpy(curr_image / 255.0).float().to(torch.device("mps")).unsqueeze(0)
     return curr_image
 
 
@@ -172,7 +172,7 @@ def eval_bc(config, ckpt_name, save_episode=True):
 
     
     print(loading_status)
-    policy.to(torch.device("cpu"))
+    policy.to(torch.device("mps"))
     policy.eval()
     print(f'Loaded: {ckpt_path}')
     stats_path = os.path.join(ckpt_dir, f'dataset_stats.pkl')
@@ -221,9 +221,9 @@ def eval_bc(config, ckpt_name, save_episode=True):
 
         ### evaluation loop
         if temporal_agg:
-            all_time_actions = torch.zeros([max_timesteps, max_timesteps+num_queries, state_dim]).to(torch.device("cpu"))
+            all_time_actions = torch.zeros([max_timesteps, max_timesteps+num_queries, state_dim]).to(torch.device("mps"))
 
-        qpos_history = torch.zeros((1, max_timesteps, state_dim)).to(torch.device("cpu"))
+        qpos_history = torch.zeros((1, max_timesteps, state_dim)).to(torch.device("mps"))
         image_list = [] # for visualization
         qpos_list = []
         target_qpos_list = []
@@ -244,7 +244,7 @@ def eval_bc(config, ckpt_name, save_episode=True):
                     image_list.append({'main': obs['image']})
                 qpos_numpy = np.array(obs['qpos'])
                 qpos = pre_process(qpos_numpy)
-                qpos = torch.from_numpy(qpos).float().to(torch.device("cpu")).unsqueeze(0)
+                qpos = torch.from_numpy(qpos).float().to(torch.device("mps")).unsqueeze(0)
                 qpos_history[:, t] = qpos
                 curr_image = get_image(ts, camera_names)
 
@@ -261,7 +261,7 @@ def eval_bc(config, ckpt_name, save_episode=True):
                         k = 0.01
                         exp_weights = np.exp(-k * np.arange(len(actions_for_curr_step)))
                         exp_weights = exp_weights / exp_weights.sum()
-                        exp_weights = torch.from_numpy(exp_weights).to(torch.device("cpu")).unsqueeze(dim=1)
+                        exp_weights = torch.from_numpy(exp_weights).to(torch.device("mps")).unsqueeze(dim=1)
                         raw_action = (actions_for_curr_step * exp_weights).sum(dim=0, keepdim=True)
                     else:
                         raw_action = all_actions[:, t % query_frequency]
@@ -277,7 +277,7 @@ def eval_bc(config, ckpt_name, save_episode=True):
                         k = 0.01
                         exp_weights = np.exp(-k * np.arange(len(actions_for_curr_step)))
                         exp_weights = exp_weights / exp_weights.sum()
-                        exp_weights = torch.from_numpy(exp_weights).to(torch.device("cpu")).unsqueeze(dim=1)
+                        exp_weights = torch.from_numpy(exp_weights).to(torch.device("mps")).unsqueeze(dim=1)
                         raw_action = (actions_for_curr_step * exp_weights).sum(dim=0, keepdim=True)
                     else:
                         raw_action = all_actions[:, t % query_frequency]
@@ -292,13 +292,13 @@ def eval_bc(config, ckpt_name, save_episode=True):
                         k = 0.01
                         exp_weights = np.exp(-k * np.arange(len(actions_for_curr_step)))
                         exp_weights = exp_weights / exp_weights.sum()
-                        exp_weights = torch.from_numpy(exp_weights).to(torch.device("cpu")).unsqueeze(dim=1)
+                        exp_weights = torch.from_numpy(exp_weights).to(torch.device("mps")).unsqueeze(dim=1)
                         raw_action = (actions_for_curr_step * exp_weights).sum(dim=0, keepdim=True)
                     else:
                         raw_action = all_actions[:, t % query_frequency]
 
                 ### post-process actions
-                raw_action = raw_action.squeeze(0).cpu().numpy()
+                raw_action = raw_action.squeeze(0).mps().numpy()
                 action = post_process(raw_action)
                 target_qpos = action
 
@@ -345,7 +345,7 @@ def eval_bc(config, ckpt_name, save_episode=True):
 
 def forward_pass(data, policy):
     image_data, qpos_data, action_data, is_pad, type = data
-    image_data, qpos_data, action_data, is_pad, type = image_data.to(torch.device("cpu")), qpos_data.to(torch.device("cpu")), action_data.to(torch.device("cpu")), is_pad.to(torch.device("cpu")), type.to(torch.device("cpu"))
+    image_data, qpos_data, action_data, is_pad, type = image_data.to(torch.device("mps")), qpos_data.to(torch.device("mps")), action_data.to(torch.device("mps")), is_pad.to(torch.device("mps")), type.to(torch.device("mps"))
     return policy(qpos_data, image_data, action_data, is_pad, type) # TODO remove None
 
 
@@ -361,7 +361,7 @@ def train_bc(train_dataloader, val_dataloader, config):
     set_seed(seed)
 
     policy = make_policy(policy_class, policy_config)
-    policy.to(torch.device("cpu"))
+    policy.to(torch.device("mps"))
     optimizer = make_optimizer(policy_class, policy)
 
 

@@ -35,15 +35,15 @@ def make_sim_env(task_name):
                                         right_gripper_qvel (1)]     # normalized gripper velocity (pos: opening, neg: closing)
                         "images": {"main": (480x640x3)}        # h, w, c, dtype='uint8'
     """
-    if 'sim_transfer_cube' in task_name:
-        xml_path = os.path.join(XML_DIR, f'bimanual_viperx_transfer_cube.xml')
-        print(xml_path)
-        physics = mujoco.Physics.from_xml_path(xml_path)
-        task = TransferCubeTask(random=False)
-        env = control.Environment(physics, task, time_limit=20, control_timestep=DT,
-                                  n_sub_steps=None, flat_observation=False)
-    else:
-        raise NotImplementedError
+    # if 'prototype' in task_name:
+    xml_path = os.path.join(XML_DIR, f'bimanual_viperx_transfer_cube.xml')
+    print(xml_path)
+    physics = mujoco.Physics.from_xml_path(xml_path)
+    task = TransferCubeTask(random=False)
+    env = control.Environment(physics, task, time_limit=20, control_timestep=DT,
+                                n_sub_steps=None, flat_observation=False)
+    # else:
+    #     raise NotImplementedError
     return env
 
 class BimanualViperXTask(base.Task):
@@ -136,14 +136,6 @@ class TransferCubeTask(BimanualViperXTask):
             name_geom_2 = physics.model.id2name(id_geom_2, 'geom')
             contact_pair = (name_geom_1, name_geom_2)
             all_contact_pairs.append(contact_pair)
-        
-        # Get geom ID
-        # geom_id = physics.model.geom_name2id("red_box")
-        # print(geom_id)
-
-        # Get geom size
-        # geom_size = physics.model.geom_size[id_geom_2]
-        # print("Size of red_box:", geom_size)
 
         touch_right_gripper = any(
             ((f"torus_seg{i}", "vx300s_right/10_right_gripper_finger") or  ("vx300s_right/10_right_gripper_finger", f"torus_seg{i}")) in all_contact_pairs 
@@ -155,32 +147,13 @@ class TransferCubeTask(BimanualViperXTask):
             for i in range(1, 13)
         )
 
-
-        # print(all_contact_pairs)
-
         reward = 0
         if touch_right_gripper:
             reward = 1
-            # print("here")
         if touch_right_gripper and not touch_table: # lifted
             reward = 4
 
         return reward
 
-
-def get_action(master_bot_left, master_bot_right):
-    action = np.zeros(14)
-    # arm action
-    action[:6] = master_bot_left.dxl.joint_states.position[:6]
-    action[7:7+6] = master_bot_right.dxl.joint_states.position[:6]
-    # gripper action
-    left_gripper_pos = master_bot_left.dxl.joint_states.position[7]
-    right_gripper_pos = master_bot_right.dxl.joint_states.position[7]
-    normalized_left_pos = MASTER_GRIPPER_POSITION_NORMALIZE_FN(left_gripper_pos)
-    normalized_right_pos = MASTER_GRIPPER_POSITION_NORMALIZE_FN(right_gripper_pos)
-    action[6] = normalized_left_pos
-    action[7+6] = normalized_right_pos
-    return action
-
-# if __name__ == '__main__':
-#     test_sim_teleop()
+if __name__ == '__main__':
+    print("sim_env.py executed")

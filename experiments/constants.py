@@ -13,42 +13,42 @@ SIM_TASK_CONFIGS = {
 
     'multiple_red':{
         'dataset_dir': DATA_DIR + '/multiple_red/',
-        'num_episodes': 2,
+        'num_episodes': 50,
         'episode_len': 200,
         'camera_names': ['top']
     },
 
     'multiple_green':{
         'dataset_dir': DATA_DIR + '/multiple_green/',
-        'num_episodes': 2,
+        'num_episodes': 50,
         'episode_len': 200,
         'camera_names': ['top']
     },
 
     'multiple_blue':{
         'dataset_dir': DATA_DIR + '/multiple_blue/',
-        'num_episodes': 2,
+        'num_episodes': 50,
         'episode_len': 200,
         'camera_names': ['top']
     },
 
     'single_cube':{
         'dataset_dir': DATA_DIR + '/single_cube/',
-        'num_episodes': 2,
+        'num_episodes': 50,
         'episode_len': 200,
         'camera_names': ['top']
     },
 
     'single_torus':{
         'dataset_dir': DATA_DIR + '/single_torus/',
-        'num_episodes': 2,
+        'num_episodes': 50,
         'episode_len': 200,
         'camera_names': ['top']
     },
 
     'mix_cube':{
         'dataset_dir': DATA_DIR + '/mix_cube/',
-        'num_episodes': 2,
+        'num_episodes': 125,
         'episode_len': 200,
         'camera_names': ['top']
     },
