@@ -263,7 +263,10 @@ def initialize_policy(ckpt_name, ckpt_dir, policy_class, policy_config):
 
     ckpt_path = os.path.join(str(ckpt_dir), str(ckpt_name))
     policy = ACTPolicy(policy_config)
-    loading_status = policy.load_state_dict(torch.load(ckpt_path)['policy_state_dict'])
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    loading_status = policy.load_state_dict(
+        torch.load(ckpt_path, map_location=device)['policy_state_dict']
+    )
     print(loading_status)
 
     policy.to(torch.device("cpu"))
