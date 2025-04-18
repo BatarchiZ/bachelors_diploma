@@ -44,6 +44,7 @@ python main.py \
 
 
 
+python main.py --ckpt_dir C:\Users\Acer\Desktop\bachelors_diploma\bachelors_diploma_v2_git\prototype_manipulator\models_v2 --csv_path C:\Users\Acer\Desktop\bachelors_diploma\bachelors_diploma_v2_git\prototype_manipulator\csv_orders\ordered_products.csv
 
 
 
