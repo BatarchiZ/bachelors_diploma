@@ -5,3 +5,4 @@ experiments/raw_data/
 experiments/ckpt_dir/
 prototype_manipulator/csv_orders/*
 prototype_manipulator/trained_models/*
+justtxt.txt
