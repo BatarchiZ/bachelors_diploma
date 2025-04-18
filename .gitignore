@@ -1,0 +1,7 @@
+.DS_Store
+.venv
+__pycache__
+experiments/raw_data/
+experiments/ckpt_dir/
+prototype_manipulator/csv_orders/
+prototype_manipulator/trained_models/

@@ -5,9 +5,8 @@ import uuid
 app = Flask(__name__)
 
 PRODUCTS = [
-    {"product_name": "blue_cube", "product_id": 1},
-    {"product_name": "red_cube", "product_id": 2},
-    {"product_name": "green_cube", "product_id": 3},
+    {"product_name": "green_cube", "product_id": 0},
+    {"product_name": "red_cube", "product_id": 1},
 ]
 
 cart = []
